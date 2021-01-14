@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import "./App.css"
+import React, { Component } from 'react'
+import Global from "./Global"
+import Countries from "./Countries";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends Component {
+  state = {
+    global:{},
+    countries : [],
+  }
+  componentDidMount(){
+    axios.get("https://api.covid19api.com/summary").then(res => {
+    this.setState({global:res.data.Global});
+    let countries = res.data.Countries;
+    countries.sort((a,b)=>{
+                return (a.TotalConfirmed < b.TotalConfirmed) ? 1 : -1;
+            });
+    this.setState({countries : countries})
+    }).catch(()=>{})
+  }
+  render() {
+    return (
+      <div id="app">
+        <h1> Covid 19 Information Center</h1>
+        <Global global = { this.state.global } > </Global>
+        <Countries countries = { this.state.countries } > </Countries>
+      </div>
+    )
+  }
 }
-
-export default App;
